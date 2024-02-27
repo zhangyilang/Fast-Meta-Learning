@@ -30,7 +30,7 @@ class KronPrecond(nn.Module):
 
     def forward(self, named_grads: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         pointer = 0
-        precond_grads = dict()
+        precond_grads = OrderedDict()
 
         for name, grad in named_grads.items():
             name_kron = name.replace('.', '_')
