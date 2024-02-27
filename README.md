@@ -12,7 +12,7 @@ Welcome to Fast-Meta-Learning! This repository is dedicated to accelerating the 
 
 The parallel implementation of meta-learning algorithms relies merely on PyTorch (≥2.0), while the datasets and models are built on top of [learn2learn](https://github.com/learnables/learn2learn/). 
 
-To set up the environment using Anaconda and pip, execute the following shell commands:
+To set up the environment using Anaconda and pip, execute the following shell command:
 
 ```shell
 $ bash env_setup
@@ -44,7 +44,7 @@ The codes have been tested under the following environment:
 
 All the parameters including dataset, algorithm, and hyperparameters are centralized in `main.py`, while algorithm implementations can be found in `src/`. As illustrative examples, implementations of [MAML](https://proceedings.mlr.press/v70/finn17a.html), [MetaSGD](https://arxiv.org/pdf/1707.09835.pdf), and [MetaCurvature](https://proceedings.neurips.cc/paper_files/paper/2019/hash/57c0531e13f40b91b3b0f1a30b529a1d-Abstract.html) are provided. 
 
-To carry out the numerical test, use the shell command
+To carry out the numerical test, use the shell command:
 
 ```shell
 $ python main.py "--arguments" "values"
