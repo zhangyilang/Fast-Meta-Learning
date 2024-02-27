@@ -1,6 +1,6 @@
 # Fast-Meta-Learning
 
-Welcome to Fast-Meta-Learning! This repository is dedicated to accelerating the implementation of meta-learning algorithms through **parallel** adaptation for a batch of tasks. Unlike to existing repos (e.g., [maml](https://github.com/cbfinn/maml), [MAML-PyTorch](https://github.com/dragen1860/MAML-Pytorch), …) that conduct task-adaptation **sequentially**, this implementation is able to achieve `batch_size` times speedup leveraging parallel processing, albeit at the cost of consuming `batch_size` times more GPU memory. 
+Welcome to Fast-Meta-Learning! This repository is dedicated to accelerating the implementation of meta-learning algorithms through **parallel** adaptation for a batch of tasks. Compared to existing repos (e.g., [maml](https://github.com/cbfinn/maml), [MAML-PyTorch](https://github.com/dragen1860/MAML-Pytorch), …) that conduct task-adaptation **sequentially**, this implementation is able to achieve `batch_size` times speedup leveraging parallel processing, albeit at the cost of consuming `batch_size` times more GPU memory. 
 
 ## 🌟Features🌟
 
