@@ -1,9 +1,10 @@
 import os
-import torch
-import numpy as np
-from typing import Sequence, Optional
+from argparse import Namespace
 from abc import ABC, abstractmethod
+from typing import Sequence, Optional
 
+import numpy as np
+import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.func as func
@@ -24,7 +25,7 @@ class MetaLearningAlgBase(ABC):
     """Abstract base class for meta-learning algorithms
     """
     @abstractmethod
-    def __init__(self, args) -> None:
+    def __init__(self, args: Namespace) -> None:
         self.args = args
 
         self.meta_trn_dataset, self.meta_val_dataset, self.meta_tst_dataset = self._get_meta_datasets()

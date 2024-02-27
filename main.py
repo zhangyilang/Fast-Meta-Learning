@@ -1,8 +1,9 @@
 import os
-import argparse
 import random
-import torch
+import argparse
+
 import numpy as np
+import torch
 
 from src.maml import MAML
 from src.meta_sgd import MetaSGD
@@ -16,7 +17,7 @@ _ALGORITHM = {'maml': MAML,
               }
 
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     args.data_dir = os.path.join(args.data_dir, args.dataset.lower())
     os.makedirs(args.data_dir, exist_ok=True)
 

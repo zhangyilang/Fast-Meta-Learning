@@ -1,7 +1,7 @@
+from typing import Iterable
+from collections import OrderedDict
 import torch
 import torch.nn as nn
-from collections import OrderedDict
-from typing import Iterable
 from src.meta_alg_base import MetaLearningAlgBase
 
 

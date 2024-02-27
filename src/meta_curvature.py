@@ -1,8 +1,8 @@
+from typing import Iterable
+from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.func as func
-from typing import Iterable
-from collections import OrderedDict
 from src.meta_alg_base import MetaLearningAlgBase
 
 
@@ -58,7 +58,7 @@ class MetaCurvature(MetaLearningAlgBase):
     """Meta-Curvature
     https://proceedings.neurips.cc/paper_files/paper/2019/hash/57c0531e13f40b91b3b0f1a30b529a1d-Abstract.html
     """
-    def __init__(self, args)  -> None:
+    def __init__(self, args) -> None:
         super().__init__(args)
 
     def _get_meta_model(self, **kwargs) -> dict[str, nn.Module]:
