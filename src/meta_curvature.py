@@ -13,7 +13,7 @@ class KronPrecond(nn.Module):
     """
     def __init__(self, named_params: Iterable[tuple[str, torch.Tensor]], **kwargs) -> None:
         super().__init__()
-        self.mc_weight = nn.ParameterDict()
+        self.kron_weights = nn.ParameterDict()
 
         for name, param in named_params:
             name = name.replace('.', '_')
@@ -21,32 +21,33 @@ class KronPrecond(nn.Module):
             param_dim = param.dim()
 
             if param_dim == 1:      # Conv2d().bias / Linear().bias
-                self.mc_weight[name] = nn.Parameter(torch.ones_like(param, **kwargs))
+                self.kron_weights[name] = nn.Parameter(torch.ones_like(param, **kwargs))
             else:                   # Linear().weight / Conv2d().weight
-                self.mc_weight[name+'_mc0'] = nn.Parameter(torch.eye(param_size[0], **kwargs))
-                self.mc_weight[name+'_mc1'] = nn.Parameter(torch.eye(param_size[1], **kwargs))
+                self.kron_weights[name + '_kron0'] = nn.Parameter(torch.eye(param_size[0], **kwargs))
+                self.kron_weights[name + '_kron1'] = nn.Parameter(torch.eye(param_size[1], **kwargs))
                 if param_dim == 4:  # Conv2d().weight
-                    self.mc_weight[name+'_mc2'] = nn.Parameter(torch.eye(param_size[2] * param_size[3], **kwargs))
+                    self.kron_weights[name + '_kron2'] = nn.Parameter(torch.eye(param_size[2] * param_size[3], **kwargs))
 
     def forward(self, named_grads: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         pointer = 0
         precond_grads = dict()
 
         for name, grad in named_grads.items():
-            name_mc = name.replace('.', '_')
+            name_kron = name.replace('.', '_')
             param_dim = grad.dim()
 
             if param_dim == 1:  # Conv2d().bias / Linear().bias
-                precond_grad = self.mc_weight[name_mc] * grad
+                precond_grad = self.kron_weights[name_kron] * grad
                 pointer += 1
             elif param_dim == 2:  # Linear().weight
-                precond_grad = self.mc_weight[name_mc+'_mc0'] @ grad @ self.mc_weight[name_mc+'_mc1']
+                precond_grad = self.kron_weights[name_kron + '_kron0'] @ grad @ self.kron_weights[name_kron + '_kron1']
                 pointer += 2
             elif param_dim == 4:  # Conv2d().weight
                 precond_grad = torch.einsum('ijk,il->ljk',
-                                           grad.flatten(start_dim=2),
-                                           self.mc_weight[name_mc+'_mc0'])
-                precond_grad = self.mc_weight[name_mc+'_mc1'] @ precond_grad @ self.mc_weight[name_mc+'_mc2']
+                                            grad.flatten(start_dim=2),
+                                            self.kron_weights[name_kron + '_kron0'])
+                precond_grad = (self.kron_weights[name_kron + '_kron1'] @ precond_grad
+                                @ self.kron_weights[name_kron + '_kron2'])
                 pointer += 3
             else:
                 raise NotImplementedError
