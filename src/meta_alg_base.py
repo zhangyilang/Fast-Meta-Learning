@@ -45,8 +45,8 @@ class MetaLearningAlgBase(ABC):
                             train_ways=self.args.num_cls,
                             train_samples=self.args.num_trn_data + self.args.num_val_data,
                             test_ways=self.args.num_cls,
-                            test_samples=self.args.num_trn_data + self.args.num_val_data,
-                            root=os.path.join(self.args.data_dir, self.args.dataset.lower()))
+                            test_samples=self.args.num_trn_data * 2,
+                            root=self.args.data_dir)
 
     def sample_task_batch(self, meta_dataset: Taskset, num_tasks: int = 1
                           ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:

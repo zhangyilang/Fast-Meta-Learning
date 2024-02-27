@@ -17,10 +17,12 @@ _ALGORITHM = {'maml': MAML,
 
 
 def main(args):
+    args.data_dir = os.path.join(args.data_dir, args.dataset.lower())
+    os.makedirs(args.data_dir, exist_ok=True)
+
     suffix = '-' + str(args.num_cls) + 'way' + str(args.num_trn_data) + 'shot'
     args.model_dir = os.path.join(args.model_dir, args.dataset.lower(), args.algorithm.lower() + suffix)
-    if not os.path.exists(args.model_dir):
-        os.makedirs(args.model_dir)
+    os.makedirs(args.model_dir, exist_ok=True)
 
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -67,7 +69,7 @@ if __name__ == '__main__':
     # task-training params
     parser.add_argument('--algorithm', type=str, default='MAML', help='Few-shot learning methods')
     parser.add_argument('--base-model', type=str, default='CNN4', help='Backbone model')
-    parser.add_argument('--num-filter', type=int, default=32, help='Number of filters per layer in CNN4')
+    parser.add_argument('--num-filter', type=int, default=64, help='Number of filters per layer in CNN4')
     parser.add_argument('--task-iter', type=int, default=5, help='Number of adaptation steps')
     parser.add_argument('--task-lr', type=float, default=1e-2, help='Learning rate for adaptation')
 

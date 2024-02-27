@@ -52,10 +52,9 @@ $ python main.py "--arguments" "values"
 
 where `arguments` and `values` are the algorithm parameters that you want to alter.
 
-For instance, the following command runs MAML on 5way-1shot *mini*-ImageNet dataset (which will be downloaded to `./datasets/`): 
+For instance, the following command runs MAML on 5way-1shot *mini*-ImageNet (which will be downloaded to `./datasets/`): 
 
 ```shell
-$ mkdir datasets
 $ python main.py --algorithm MAML --dataset mini-ImageNet --data-dir ./datasets/ --num-cls 5 --num-trn-data 1
 ```
 
