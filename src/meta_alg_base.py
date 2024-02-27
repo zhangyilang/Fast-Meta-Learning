@@ -10,10 +10,9 @@ import torch.nn as nn
 import torch.func as func
 from learn2learn.data import Taskset, partition_task
 from learn2learn.vision.benchmarks import get_tasksets
-from learn2learn.vision.models import CNN4, ResNet12, WRN28, get_pretrained_backbone
+from learn2learn.vision.models import CNN4, ResNet12, WRN28
 
 from src.utils import Checkpointer
-
 
 
 _BASE_MODELS = {'cnn4': CNN4,
