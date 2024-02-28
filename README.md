@@ -38,7 +38,7 @@ The codes have been tested under the following environment:
 
 ---
 
-**⚠️Note:** [learn2learn](https://github.com/learnables/learn2learn/) may fail to build under python 3.11. 
+**⚠️Note:** [learn2learn](https://github.com/learnables/learn2learn/) may fail to build under python≥3.11. 
 
 ## How to use the codes
 
