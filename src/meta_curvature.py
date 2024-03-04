@@ -69,7 +69,7 @@ class MetaCurvature(MetaLearningAlgBase):
                 'precond': KronPrecond(self.base_model.named_parameters(), **kwargs)}
 
     def adapt(self, trn_inputs: torch.Tensor, trn_targets: torch.Tensor,
-              first_order: bool = False) -> OrderedDict[str, nn.Parameter]:
+              first_order: bool = False) -> dict[str, nn.Parameter]:
         batch_size = trn_inputs.size(0)
         batch_params = OrderedDict()
         for name, param in self.meta_model['init'].named_parameters():
