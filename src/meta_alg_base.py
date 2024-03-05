@@ -32,9 +32,9 @@ class MetaLearningAlgBase(ABC):
         self.meta_model = self._get_meta_model(device=self.args.device)    # real device
         self.nll = nn.CrossEntropyLoss()   # default nll for clf
 
-        def _logit_loss_fn(params: dict[str, nn.Parameter], inputs: torch.Tensor,
+        def _logit_loss_fn(named_params: dict[str, nn.Parameter], inputs: torch.Tensor,
                            targets: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-            logits = func.functional_call(self.base_model, params, inputs)
+            logits = func.functional_call(self.base_model, named_params, inputs)
             return logits, self.nll(logits, targets)
 
         self.batch_logit_loss_fn = func.vmap(_logit_loss_fn)
@@ -116,8 +116,9 @@ class MetaLearningAlgBase(ABC):
             (batch_trn_inputs, batch_trn_targets,
              batch_val_inputs, batch_val_targets) = self.sample_task_batch(self.meta_trn_dataset, self.args.batch_size)
 
-            batch_params = self.adapt(batch_trn_inputs, batch_trn_targets, first_order=self.args.first_order)
-            batch_val_logits, batch_losses = self.batch_logit_loss_fn(batch_params, batch_val_inputs, batch_val_targets)
+            batch_named_params = self.adapt(batch_trn_inputs, batch_trn_targets, first_order=self.args.first_order)
+            batch_val_logits, batch_losses = self.batch_logit_loss_fn(batch_named_params,
+                                                                      batch_val_inputs, batch_val_targets)
             meta_loss = batch_losses.mean()
             meta_loss.backward()
 
@@ -164,9 +165,9 @@ class MetaLearningAlgBase(ABC):
         for eval_idx in range(num_tasks):
             (batch_trn_inputs, batch_trn_targets,
              batch_tst_inputs, batch_tst_targets) = self.sample_task_batch(meta_dataset)
-            batch_params = self.adapt(batch_trn_inputs, batch_trn_targets, first_order=True)
+            batch_named_params = self.adapt(batch_trn_inputs, batch_trn_targets, first_order=True)
             with torch.no_grad():
-                logits, losses = self.batch_logit_loss_fn(batch_params, batch_tst_inputs, batch_tst_targets)
+                logits, losses = self.batch_logit_loss_fn(batch_named_params, batch_tst_inputs, batch_tst_targets)
                 loss_list.append(losses.mean().item())
                 acc_list.append((logits.argmax(dim=-1) == batch_tst_targets).float().mean().item())
 

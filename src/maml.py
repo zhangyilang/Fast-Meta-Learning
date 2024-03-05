@@ -17,13 +17,13 @@ class MAML(MetaLearningAlgBase):
     def adapt(self, trn_inputs: torch.Tensor, trn_targets: torch.Tensor,
               first_order: bool = False) -> dict[str, torch.nn.Parameter]:
         batch_size = trn_inputs.size(0)
-        batch_params = OrderedDict()
-        for name, param in self.meta_model['init'].named_parameters():
-            batch_params[name] = param.expand(batch_size, *param.size())
+        batch_named_params = OrderedDict()
+        for name, batch_param in self.meta_model['init'].named_parameters():
+            batch_named_params[name] = batch_param.expand(batch_size, *batch_param.size())
 
         for _ in range(self.args.task_iter):
-            batch_grads = self.batch_grad_fn(batch_params, trn_inputs, trn_targets)
-            for name, param in batch_params.items():
-                batch_params[name] = param - self.args.task_lr * batch_grads[name]
+            batch_grads = self.batch_grad_fn(batch_named_params, trn_inputs, trn_targets)
+            for name, batch_param in batch_named_params.items():
+                batch_named_params[name] = batch_param - self.args.task_lr * batch_grads[name]
 
-        return batch_params
+        return batch_named_params
