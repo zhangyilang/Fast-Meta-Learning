@@ -70,6 +70,8 @@ class MetaCurvature(MetaLearningAlgBase):
 
     def adapt(self, trn_inputs: torch.Tensor, trn_targets: torch.Tensor,
               first_order: bool = False) -> dict[str, nn.Parameter]:
+        # TODO: better first-order implementation. Note: torch.func.grad() will not respect the outer torch.no_grad()
+        #  context manager; see https://pytorch.org/docs/stable/generated/torch.func.grad.html#torch-func-grad
         batch_size = trn_inputs.size(0)
         batch_named_params = OrderedDict()
         for name, batch_param in self.meta_model['init'].named_parameters():
@@ -77,6 +79,8 @@ class MetaCurvature(MetaLearningAlgBase):
 
         for _ in range(self.args.task_iter):
             batch_grads = self.batch_grad_fn(batch_named_params, trn_inputs, trn_targets)
+            if first_order:
+                batch_grads = {name: grad.detach() for name, grad in batch_grads.items()}
             batch_grads = func.vmap(self.meta_model['precond'])(batch_grads)
 
             for name, batch_param in batch_named_params.items():

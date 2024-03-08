@@ -16,6 +16,8 @@ class MAML(MetaLearningAlgBase):
 
     def adapt(self, trn_inputs: torch.Tensor, trn_targets: torch.Tensor,
               first_order: bool = False) -> dict[str, torch.nn.Parameter]:
+        # TODO: better first-order implementation. Note: torch.func.grad() will not respect the outer torch.no_grad()
+        #  context manager; see https://pytorch.org/docs/stable/generated/torch.func.grad.html#torch-func-grad
         batch_size = trn_inputs.size(0)
         batch_named_params = OrderedDict()
         for name, batch_param in self.meta_model['init'].named_parameters():
@@ -24,6 +26,7 @@ class MAML(MetaLearningAlgBase):
         for _ in range(self.args.task_iter):
             batch_grads = self.batch_grad_fn(batch_named_params, trn_inputs, trn_targets)
             for name, batch_param in batch_named_params.items():
-                batch_named_params[name] = batch_param - self.args.task_lr * batch_grads[name]
+                batch_grad = batch_grads[name].detach() if first_order else batch_grads[name]
+                batch_named_params[name] = batch_param - self.args.task_lr * batch_grad
 
         return batch_named_params
