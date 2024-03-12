@@ -1,19 +1,10 @@
-from typing import Iterable
+import math
 from collections import OrderedDict
 
 import torch
 import torch.nn as nn
 
 from src.meta_alg_base import MetaLearningAlgBase
-
-
-def _log_lr(named_params: Iterable, **kwargs) -> nn.Module:
-    log_lr = nn.ParameterDict()
-
-    for name, param in named_params:
-        log_lr[name.replace('.', '_')] = nn.Parameter(torch.zeros_like(param, **kwargs))
-
-    return log_lr
 
 
 class MetaSGD(MetaLearningAlgBase):
@@ -24,8 +15,13 @@ class MetaSGD(MetaLearningAlgBase):
         super().__init__(args)
 
     def _get_meta_model(self, **kwargs) -> dict[str, nn.Module]:
+        log_lr = nn.ParameterDict()
+        log_lr_init = math.log(self.args.task_lr)
+        for name, param in self.base_model.meta_named_parameters():
+            log_lr[name.replace('.', '_')] = nn.Parameter(torch.empty_like(param, **kwargs).fill_(log_lr_init))
+
         return {'init': self._get_base_model(**kwargs),
-                'log_lr': _log_lr(self.base_model.named_parameters(), **kwargs)}
+                'log_lr': log_lr}
 
     def adapt(self, trn_inputs: torch.Tensor, trn_targets: torch.Tensor,
               first_order: bool = False) -> dict[str, torch.nn.Parameter]:
@@ -35,7 +31,7 @@ class MetaSGD(MetaLearningAlgBase):
         batch_named_params = OrderedDict()
         for name, batch_param in self.meta_model['init'].named_parameters():
             batch_named_params[name] = batch_param.expand(batch_size, *batch_param.size())
-        task_lr = OrderedDict({name.replace('_', '.'): log_lr.exp() * self.args.task_lr
+        task_lr = OrderedDict({name.replace('_', '.'): log_lr.exp()
                                for name, log_lr in self.meta_model['log_lr'].items()})
 
         for _ in range(self.args.task_iter):
