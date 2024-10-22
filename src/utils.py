@@ -7,8 +7,8 @@ class Checkpointer:
 
     def update(self, acc: float) -> None:
         self.counter += 1
-        self.save_fn(self.alg_name + '_{0:02d}.ct'.format(self.counter))
+        self.save_fn(self.alg_name + f'_{self.counter:02d}.ct')
 
         if acc > self.best_acc:
             self.best_acc = acc
-            self.save_fn(self.alg_name + '_final.ct'.format(self.counter))
+            self.save_fn(self.alg_name + '_final.ct')
